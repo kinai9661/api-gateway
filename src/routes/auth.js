@@ -1,5 +1,4 @@
 import express from 'express';
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router();
@@ -14,9 +13,8 @@ router.post('/login', async (req, res) => {
       return res.status(500).json({ error: 'Admin password not configured' });
     }
 
-    // 驗證密碼
-    const validPassword = await bcrypt.compare(password, adminPassword);
-    if (!validPassword) {
+    // 直接比較明文密碼
+    if (password !== adminPassword) {
       return res.status(401).json({ error: 'Invalid password' });
     }
 
