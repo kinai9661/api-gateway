@@ -1,0 +1,14 @@
+{
+  "name": "api-gateway",
+  "services": [
+    {
+      "name": "api-gateway",
+      "type": "nodejs",
+      "buildCommand": "npm install && npx prisma generate",
+      "startCommand": "npm start",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
