@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  apiKeys   ApiKey[]
+}
+
+model ApiKey {
+  id         String      @id @default(cuid())
+  userId     String
+  key        String      @unique
+  name       String
+  quotaLimit Int         @default(1000000)
+  quotaUsed  Int         @default(0)
+  status     String      @default("active")
+  createdAt  DateTime    @default(now())
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usageLogs  UsageLog[]
+}
+
+model Provider {
+  id        String      @id @default(cuid())
+  name      String
+  type      String
+  apiKey    String
+  endpoint  String
+  priority  Int         @default(0)
+  status    String      @default("active")
+  createdAt DateTime    @default(now())
+  usageLogs UsageLog[]
+}
+
+model UsageLog {
+  id          String   @id @default(cuid())
+  apiKeyId    String
+  providerId  String
+  serviceType String
+  tokensUsed  Int      @default(0)
+  cost        Float    @default(0)
+  createdAt   DateTime @default(now())
+  apiKey      ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  provider    Provider @relation(fields: [providerId], references: [id])
+}
