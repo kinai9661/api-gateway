@@ -11,6 +11,7 @@
 - 🏢 多供應商管理
 - 📊 使用統計和記錄
 - 👨‍💼 後台管理系統
+- 🖥️ **React 前端管理介面**
 
 ## 快速開始
 
@@ -68,6 +69,7 @@ npm run dev
 - `DELETE /api/admin/providers/:id` - 刪除供應商
 - `GET /api/admin/stats` - 統計數據
 - `GET /api/admin/users` - 用戶列表
+- `GET /api/admin/usage-logs` - 使用記錄
 
 ## 使用示例
 
@@ -113,6 +115,29 @@ curl -X POST http://localhost:3000/api/v1/images/generations \
   }'
 ```
 
+## 前端介面
+
+本專案包含完整的 React + Vite 前端管理介面。
+
+### 啟動前端
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+前端將在 `http://localhost:5173` 運行。
+
+### 前端功能
+
+- 📊 儀表板 - 統計數據概覽
+- 🔑 API Key 管理 - 創建、查看、刪除、啟用/停用
+- 🏢 供應商管理 - 添加、編輯、刪除 API 供應商
+- 📝 使用記錄 - 查看 API 調用歷史和統計
+
+詳細說明請參考 [`frontend/README.md`](frontend/README.md)
+
 ## Zeabur部署
 
 ### 1. 準備工作
@@ -156,11 +181,18 @@ npm run db:studio
 
 ## 技術棧
 
+### 後端
 - Node.js + Express
 - Prisma ORM
 - PostgreSQL
 - JWT認證
 - bcryptjs加密
+
+### 前端
+- React 18
+- Vite
+- React Router
+- Axios
 
 ## 免費方案優化
 

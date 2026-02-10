@@ -39,6 +39,24 @@ model Provider {
   status    String      @default("active")
   createdAt DateTime    @default(now())
   usageLogs UsageLog[]
+  models    Model[]
+}
+
+model Model {
+  id          String    @id @default(cuid())
+  providerId  String
+  modelId     String
+  name        String
+  type        String
+  description String?
+  contextSize Int?
+  pricing     String?
+  status      String    @default("active")
+  lastSynced  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  provider    Provider  @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, modelId])
 }
 
 model UsageLog {

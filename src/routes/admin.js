@@ -54,28 +54,37 @@ router.delete('/providers/:id', authenticateToken, requireAdmin, async (req, res
 // 統計數據
 router.get('/stats', authenticateToken, requireAdmin, async (req, res) => {
   try {
-    const [totalUsers, totalKeys, totalUsage, recentLogs] = await Promise.all([
+    const [totalUsers, totalApiKeys, totalProviders, totalUsage, chatUsage, imageUsage] = await Promise.all([
       prisma.user.count(),
       prisma.apiKey.count(),
+      prisma.provider.count(),
       prisma.usageLog.aggregate({
-        _sum: { tokensUsed: true, cost: true }
+        _sum: { tokensUsed: true, cost: true },
+        _count: true
       }),
-      prisma.usageLog.findMany({
-        take: 100,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          apiKey: { select: { name: true, user: { select: { email: true } } } },
-          provider: { select: { name: true } }
-        }
+      prisma.usageLog.aggregate({
+        where: { serviceType: 'chat' },
+        _count: true
+      }),
+      prisma.usageLog.aggregate({
+        where: { serviceType: 'image' },
+        _count: true
       })
     ]);
 
     res.json({
       totalUsers,
-      totalKeys,
-      totalTokensUsed: totalUsage._sum.tokensUsed || 0,
-      totalCost: totalUsage._sum.cost || 0,
-      recentLogs
+      totalApiKeys,
+      totalProviders,
+      totalRequests: totalUsage._count,
+      totalTokens: totalUsage._sum.tokensUsed || 0,
+      totalCost: (totalUsage._sum.cost || 0).toFixed(4),
+      chatRequests: chatUsage._count,
+      imageRequests: imageUsage._count,
+      avgCostPerRequest: totalUsage._count > 0
+        ? (totalUsage._sum.cost / totalUsage._count).toFixed(4)
+        : 0,
+      monthlyCost: (totalUsage._sum.cost || 0).toFixed(4)
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -95,6 +104,23 @@ router.get('/users', authenticateToken, requireAdmin, async (req, res) => {
       }
     });
     res.json(users);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 獲取使用記錄
+router.get('/usage-logs', authenticateToken, requireAdmin, async (req, res) => {
+  try {
+    const logs = await prisma.usageLog.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 500,
+      include: {
+        apiKey: { select: { name: true } },
+        provider: { select: { name: true } }
+      }
+    });
+    res.json(logs);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
