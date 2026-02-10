@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import authRoutes from './routes/auth.js';
 import apiKeyRoutes from './routes/apiKeys.js';
 import chatRoutes from './routes/chat.js';
@@ -11,6 +13,9 @@ import { errorHandler } from './middleware/errorHandler.js';
 import modelDiscovery from './services/modelDiscovery.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,6 +34,20 @@ app.use('/api/models', modelsRoutes);
 // 健康檢查
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// 提供前端靜態文件
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDistPath));
+
+// SPA 支持 - 所有非 API 路由返回 index.html
+app.get('*', (req, res) => {
+  // 如果是 API 請求，返回 404
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  // 否則返回前端 index.html
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
 app.use(errorHandler);

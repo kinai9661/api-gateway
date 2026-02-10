@@ -35,16 +35,39 @@ cp .env.example .env
 npm run db:push
 ```
 
-### 4. 啟動服務
+### 4. 構建前端並啟動服務
 
+**生產模式（推薦）：**
 ```bash
+npm run build:start
+```
+
+這會自動構建前端並啟動後端服務器，前端和後端在同一個端口運行。
+
+**分步驟：**
+```bash
+# 構建前端
+npm run build
+
+# 啟動服務器
 npm start
 ```
 
-開發模式（自動重啟）：
+**開發模式（前端和後端分開）：**
 ```bash
+# 終端 1 - 啟動後端
+npm run dev
+
+# 終端 2 - 啟動前端開發服務器
+cd frontend
+npm install
 npm run dev
 ```
+
+### 5. 訪問應用
+
+- **生產模式：** http://localhost:3000
+- **開發模式：** http://localhost:5173
 
 ## API端點
 
@@ -117,23 +140,28 @@ curl -X POST http://localhost:3000/api/v1/images/generations \
 
 ## 前端介面
 
-本專案包含完整的 React + Vite 前端管理介面。
+本專案包含完整的 React + Vite 前端管理介面，已整合到後端服務器中。
 
-### 啟動前端
+### 訪問前端
 
+**生產模式：**
+- 前端和後端在同一個端口運行
+- 訪問：http://localhost:3000
+
+**開發模式：**
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-前端將在 `http://localhost:5173` 運行。
+前端將在 `http://localhost:5173` 運行（僅用於開發）
 
 ### 前端功能
 
 - 📊 儀表板 - 統計數據概覽
 - 🔑 API Key 管理 - 創建、查看、刪除、啟用/停用
 - 🏢 供應商管理 - 添加、編輯、刪除 API 供應商
+- 🤖 模型管理 - 自動發現和刷新模型列表
 - 📝 使用記錄 - 查看 API 調用歷史和統計
 
 詳細說明請參考 [`frontend/README.md`](frontend/README.md)
