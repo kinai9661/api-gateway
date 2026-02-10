@@ -29,8 +29,7 @@ export const authenticateApiKey = async (req, res, next) => {
 
   try {
     const key = await prisma.apiKey.findUnique({
-      where: { key: apiKey, status: 'active' },
-      include: { user: true }
+      where: { key: apiKey, status: 'active' }
     });
 
     if (!key) {

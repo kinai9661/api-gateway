@@ -4,11 +4,13 @@
 
 ## 功能特性
 
-- 🔐 用戶認證系統（註冊/登入）
+- 🔐 管理員密碼登入（環境變量配置）
 - 🔑 API Key管理（生成、配額控制）
 - 💬 聊天API（兼容OpenAI格式）
 - 🎨 圖片生成API
 - 🏢 多供應商管理
+- 🤖 自動發現模型
+- ⏰ 定時自動更新模型
 - 📊 使用統計和記錄
 - 👨‍💼 後台管理系統
 - 🖥️ **React 前端管理介面**
@@ -72,8 +74,7 @@ npm run dev
 ## API端點
 
 ### 認證
-- `POST /api/auth/register` - 註冊
-- `POST /api/auth/login` - 登入
+- `POST /api/auth/login` - 管理員登入（使用環境變量密碼）
 
 ### API Key管理
 - `GET /api/keys` - 獲取API Keys

@@ -1,60 +1,40 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PrismaClient } from '@prisma/client';
 
 const router = express.Router();
-const prisma = new PrismaClient();
 
-// 註冊
-router.post('/register', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({ error: 'Email already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({
-      data: { email, password: hashedPassword }
-    });
-
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// 登入
+// 管理員登入（使用環境變量密碼）
 router.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const adminPassword = process.env.ADMIN_PASSWORD;
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+    if (!adminPassword) {
+      return res.status(500).json({ error: 'Admin password not configured' });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    // 驗證密碼
+    const validPassword = await bcrypt.compare(password, adminPassword);
     if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Invalid password' });
     }
 
+    // 生成 JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email, role: user.role },
+      { role: 'admin', email: 'admin' },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
-    res.json({ token, user: { id: user.id, email: user.email, role: user.role } });
+    res.json({
+      token,
+      user: {
+        id: 'admin',
+        email: 'admin',
+        role: 'admin'
+      }
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

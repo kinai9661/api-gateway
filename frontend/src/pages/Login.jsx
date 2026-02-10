@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
 export default function Login({ onLogin }) {
-  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -15,11 +14,11 @@ export default function Login({ onLogin }) {
     setLoading(true)
 
     try {
-      const response = await axios.post('/api/auth/login', { email, password })
+      const response = await axios.post('/api/auth/login', { password })
       onLogin(response.data.token)
       navigate('/')
     } catch (err) {
-      setError(err.response?.data?.error || '登入失敗，請檢查您的憑證')
+      setError(err.response?.data?.error || '登入失敗，請檢查您的密碼')
     } finally {
       setLoading(false)
     }
@@ -46,7 +45,7 @@ export default function Login({ onLogin }) {
           <h1 style={{ fontSize: '28px', fontWeight: 'bold', color: '#1f2937', marginBottom: '10px' }}>
             API Gateway
           </h1>
-          <p style={{ color: '#6b7280', fontSize: '14px' }}>登入您的帳戶</p>
+          <p style={{ color: '#6b7280', fontSize: '14px' }}>管理員登入</p>
         </div>
 
         {error && (
@@ -63,30 +62,9 @@ export default function Login({ onLogin }) {
         )}
 
         <form onSubmit={handleSubmit}>
-          <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
-              電子郵件
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1px solid #d1d5db',
-                borderRadius: '6px',
-                fontSize: '14px',
-                transition: 'border-color 0.2s'
-              }}
-              placeholder="your@email.com"
-            />
-          </div>
-
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#374151', fontSize: '14px' }}>
-              密碼
+              管理員密碼
             </label>
             <input
               type="password"
@@ -101,7 +79,7 @@ export default function Login({ onLogin }) {
                 fontSize: '14px',
                 transition: 'border-color 0.2s'
               }}
-              placeholder="••••••••"
+              placeholder="請輸入管理員密碼"
             />
           </div>
 
@@ -125,11 +103,8 @@ export default function Login({ onLogin }) {
           </button>
         </form>
 
-        <p style={{ textAlign: 'center', marginTop: '24px', color: '#6b7280', fontSize: '14px' }}>
-          還沒有帳戶？{' '}
-          <Link to="/register" style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: '500' }}>
-            立即註冊
-          </Link>
+        <p style={{ textAlign: 'center', marginTop: '24px', color: '#6b7280', fontSize: '12px' }}>
+          請使用環境變量中配置的管理員密碼登入
         </p>
       </div>
     </div>
